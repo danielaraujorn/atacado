@@ -1,0 +1,14 @@
+type Product {
+	id: ID! @id @unique
+	name: String!
+	normalizedName: String!
+	description: String
+	price: Int!
+	unit: String
+	store: Store! @relation(name: "StoreProducts")
+	categories: [Category] @relation(name: "CategoryProducts")
+	valid: Boolean! @default(value: true)
+	deleted: Boolean! @default(value: false)
+	createdAt: DateTime! @createdAt
+	updatedAt: DateTime! @updatedAt
+}

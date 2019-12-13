@@ -1,0 +1,58 @@
+# import User, Purchase, Language, Store, CartItem, Category, Product, UserRole from "./generated/graphql-schema/prisma.graphql"
+
+directive @requireAuth on QUERY | FIELD | FIELD_DEFINITION | MUTATION
+directive @requireRole(
+	role: UserRole
+) on QUERY | FIELD | FIELD_DEFINITION | MUTATION
+
+scalar JSON
+
+input ProductQuantityInput {
+	productId: ID!
+	quantity: Int!
+}
+input NewProductInput {
+	name: String!
+	price: Int!
+}
+
+type CountType {
+	count: Int
+}
+
+type Query {
+	# User:
+	getOwnUser: User @requireAuth
+	getUsers(email: String!): [User] @requireAuth
+	getCart: [CartItem] @requireAuth
+	getCartCount: CountType @requireAuth
+
+	# Product:
+	getProducts(where: ProductWhereInput): [Product]
+	getProduct(id: ID!): Product!
+
+	# Category
+	getCategories(where: CategoryWhereInput): [Category]
+
+	# Store:
+	getStore(id: ID!): Store!
+	getStores(where: StoreWhereInput): [Store]
+}
+
+type Mutation {
+	# Product:
+	createStore(name: String!, products: [NewProductInput]): Store
+		@requireRole(role: OWNER)
+
+	# Product:
+	createProduct(
+		name: String!
+		storeId: ID!
+		price: Int!
+		description: String
+	): Product @requireRole(role: OWNER)
+
+	# User:
+	createUser(firstName: String!, email: String!, password: String!): User!
+	loginUser(email: String!, password: String!, rememberMe: Boolean): User!
+}

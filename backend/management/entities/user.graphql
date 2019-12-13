@@ -1,0 +1,20 @@
+enum UserRole {
+	CLIENT
+	OWNER
+	ADMIN
+}
+
+type User {
+	id: ID! @id @unique
+	firstName: String!
+	email: String! @unique
+	password: String!
+	store: Store @relation(name: "UserStore", link: TABLE)
+	role: UserRole @default(value: CLIENT)
+	cart: [CartItem]
+	favorites: [Product]
+	language: Language @default(value: PTBR)
+	deleted: Boolean! @default(value: false)
+	createdAt: DateTime! @createdAt
+	updatedAt: DateTime! @updatedAt
+}

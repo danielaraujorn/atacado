@@ -1,0 +1,6 @@
+type Purchase {
+	id: ID! @id @unique
+	cart: [CartItem]!
+	createdAt: DateTime! @createdAt
+	updatedAt: DateTime! @updatedAt
+}

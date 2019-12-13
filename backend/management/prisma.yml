@@ -1,0 +1,19 @@
+endpoint: http://localhost:5001
+datamodel:
+  - entities/user.graphql
+  - entities/product.graphql
+  - entities/store.graphql
+  - entities/purchase.graphql
+  - entities/cartItem.graphql
+  - entities/category.graphql
+  - entities/language.graphql
+generate:
+  - generator: javascript-client
+    output: ./generated/prisma-client/
+  - generator: graphql-schema
+    output: ./generated/graphql-schema/prisma.graphql
+hooks:
+  post-deploy:
+    - prisma generate
+seed:
+  run: node ./seed.js

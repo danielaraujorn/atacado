@@ -1,0 +1,11 @@
+type Store {
+	id: ID! @id @unique
+	name: String!
+	normalizedName: String!
+	valid: Boolean! @default(value: false)
+	user: User! @relation(name: "UserStore")
+	products: [Product] @relation(onDelete: CASCADE, name: "StoreProducts")
+	deleted: Boolean! @default(value: false)
+	createdAt: DateTime! @createdAt
+	updatedAt: DateTime! @updatedAt
+}

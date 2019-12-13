@@ -1,0 +1,9 @@
+type CartItem {
+	id: ID! @id @unique
+	user: User!
+	product: Product!
+	quantity: Int!
+	deliveryDate: DateTime
+	createdAt: DateTime! @createdAt
+	updatedAt: DateTime! @updatedAt
+}

@@ -1,0 +1,10 @@
+type Category {
+	id: ID! @id @unique
+	name: String!
+	normalizedName: String!
+	products: [Product] @relation(name: "CategoryProducts")
+	valid: Boolean! @default(value: true)
+	deleted: Boolean! @default(value: false)
+	createdAt: DateTime! @createdAt
+	updatedAt: DateTime! @updatedAt
+}
