@@ -5,7 +5,7 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { createHttpLink } from 'apollo-link-http';
 import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory';
 import { onError } from 'apollo-link-error';
-const REACT_APP_HOST = 'http://9a82279e.ngrok.io/graphql';
+const REACT_APP_HOST = 'http://8822fcb9.ngrok.io/graphql';
 const REACT_APP_WSHOST = 'ws://192.168.1.5:4000/graphql';
 
 const hasSubscriptionOperation = ({ query: { definitions }, getContext }) => {

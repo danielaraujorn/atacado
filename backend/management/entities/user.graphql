@@ -12,7 +12,7 @@ type User {
 	store: Store @relation(name: "UserStore", link: TABLE)
 	role: UserRole @default(value: CLIENT)
 	cart: [CartItem]
-	favorites: [Product]
+	favorites: [Product] @relation(name: "UserFavorites")
 	language: Language @default(value: PTBR)
 	deleted: Boolean! @default(value: false)
 	createdAt: DateTime! @createdAt

@@ -17,7 +17,7 @@ export const AuthLoadingComponent = ({ navigation }) => {
     await AsyncStorage.clear();
     navigation.navigate('Auth');
   };
-
+  console.log('authLoading');
   useQuery(GET_OWN_USER, {
     onCompleted,
     onError,

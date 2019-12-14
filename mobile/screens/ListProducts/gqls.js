@@ -19,3 +19,9 @@ export const GET_PRODUCTS = gql`
     }
   }
 `;
+
+export const IS_PRODUCT_FAVORITE = gql`
+  query isProductFavorite($id: ID!) {
+    isProductFavorite(id: $id)
+  }
+`;

@@ -1,12 +1,12 @@
 import React from 'react';
-import { StatusBar, Dimensions } from 'react-native';
+import { Dimensions } from 'react-native';
 import { SliderBox } from 'react-native-image-slider-box';
 import { Container, Text, Content, Icon, H1, View } from 'native-base';
 import theme from '../../theme';
-import { Button } from '../../components';
-import LinearGradient from 'react-native-linear-gradient';
-import { useQuery } from '@apollo/react-hooks';
-import { GET_PRODUCT } from './gqls';
+import { Button, Header } from '../../components';
+import { CartResume } from '../Cart';
+import { useQuery, useMutation } from '@apollo/react-hooks';
+import { GET_PRODUCT, IS_PRODUCT_FAVORITE, INSERT_FAVORITE } from './gqls';
 
 const images = [
   'http://placeimg.com/640/480/any',
@@ -18,43 +18,50 @@ const images = [
 
 export const ProductComponent = ({ navigation }) => {
   const productId = navigation.getParam('id');
-  const { data, loading, error } = useQuery(GET_PRODUCT, {
+  const { data = {}, loading, error } = useQuery(GET_PRODUCT, {
     variables: { id: productId },
   });
+  const { data: favoriteData } = useQuery(IS_PRODUCT_FAVORITE, {
+    variables: { id: productId },
+  });
+  const { isProductFavorite = false } = favoriteData;
+
+  const [toggleFavorite] = useMutation(INSERT_FAVORITE, {
+    variables: { id: productId },
+    optimisticResponse: {
+      toggleFavorite: !isProductFavorite,
+    },
+    update: (cache, { data: { toggleFavorite: toogleFavoriteData } }) => {
+      cache.writeQuery({
+        query: IS_PRODUCT_FAVORITE,
+        variables: { id: productId },
+        data: { isProductFavorite: toogleFavoriteData },
+      });
+    },
+  });
+
   if (loading || error) return null;
+
   const { getProduct: product = {} } = data;
   const { name, price, description, unit } = product;
   const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+
   return (
     <Container>
-      <StatusBar
-        barStyle='light-content'
-        backgroundColor={theme.brandPrimary}
-      />
-      <View
-        style={{
-          // position: 'absolute',
-          zIndex: 1,
-          display: 'flex',
-          flexDirection: 'row',
-          width: '100%',
-          justifyContent: 'space-between',
-          padding: 2,
-          backgroundColor: theme.brandPrimary,
-          // paddingBottom: 26,
-        }}
-      >
+      <Header>
         <View>
           <Button light transparent onPress={() => navigation.goBack()}>
-            <Icon style={{ fontSize: 26 }} name='arrow-back' />
+            <Icon name='arrow-back' />
           </Button>
         </View>
-        <View>
-          <Button light transparent>
-            <Icon style={{ fontSize: 26, color: 'red' }} name='heart' />
-          </Button>
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: theme.brandLight, fontSize: 18 }}>Produto</Text>
         </View>
-      </View>
+        <Button light transparent onPress={toggleFavorite}>
+          <Icon name={isProductFavorite ? 'heart' : 'heart-empty'} />
+        </Button>
+        <CartResume />
+      </Header>
       <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
         <SliderBox
           images={images}

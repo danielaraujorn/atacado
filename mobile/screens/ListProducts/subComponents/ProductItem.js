@@ -2,9 +2,13 @@ import React from 'react';
 import { Image, TouchableOpacity } from 'react-native';
 import { Text, View, Icon } from 'native-base';
 import theme from '../../../theme';
+import { useQuery } from '@apollo/react-hooks';
+import { IS_PRODUCT_FAVORITE } from '../gqls';
 
 export const ProductItem = ({ product, navigation }) => {
   const { id, name, description, price, favorite = false, unit } = product;
+  const { data = {} } = useQuery(IS_PRODUCT_FAVORITE, { variables: { id } });
+  const { isProductFavorite = false } = data;
   return (
     <TouchableOpacity
       activeOpacity={1}
@@ -16,7 +20,7 @@ export const ProductItem = ({ product, navigation }) => {
     >
       <View>
         <View style={{ flexDirection: 'row-reverse' }}>
-          {!!favorite && (
+          {!!isProductFavorite && (
             <Icon
               style={{
                 position: 'absolute',

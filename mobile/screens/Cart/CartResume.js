@@ -6,8 +6,7 @@ import { GET_CART_COUNT } from './gqls';
 
 export const CartResume = () => {
   const { data = {} } = useQuery(GET_CART_COUNT);
-  const { getCartCount = {} } = data;
-  const { count = 0 } = getCartCount;
+  const { getCartCount: count = 0 } = data;
   return (
     <Button transparent light badgeNumber={count} showBadge={count > 0}>
       <Icon name='cart' />

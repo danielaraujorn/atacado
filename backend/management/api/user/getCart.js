@@ -17,5 +17,5 @@ exports.getCartCount = async (_, args, ctx) => {
 		.aggregate()
 		.count()
 
-	return { count: getCartCount }
+	return getCartCount
 }

@@ -11,3 +11,15 @@ export const GET_PRODUCT = gql`
     }
   }
 `;
+
+export const IS_PRODUCT_FAVORITE = gql`
+  query isProductFavorite($id: ID!) {
+    isProductFavorite(id: $id)
+  }
+`;
+
+export const INSERT_FAVORITE = gql`
+  mutation toggleFavorite($id: ID!) {
+    toggleFavorite(id: $id)
+  }
+`;

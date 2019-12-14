@@ -7,6 +7,7 @@ type Product {
 	unit: String
 	store: Store! @relation(name: "StoreProducts")
 	categories: [Category] @relation(name: "CategoryProducts")
+	favoriteUsers: [User] @relation(name: "UserFavorites")
 	valid: Boolean! @default(value: true)
 	deleted: Boolean! @default(value: false)
 	createdAt: DateTime! @createdAt

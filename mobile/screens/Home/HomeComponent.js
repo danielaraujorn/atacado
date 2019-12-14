@@ -1,15 +1,8 @@
-import React, { useState, useRef, useMemo, useCallback } from 'react';
-import { useQuery, useMutation } from '@apollo/react-hooks';
-import {
-  TouchableOpacity,
-  StatusBar,
-  Dimensions,
-  ScrollView,
-  Image,
-  TextInput,
-} from 'react-native';
-import { Container, Icon, Badge, View, Text } from 'native-base';
-import { Button } from '../../components';
+import React, { useState } from 'react';
+import { useQuery } from '@apollo/react-hooks';
+import { TextInput } from 'react-native';
+import { Container, Icon, View } from 'native-base';
+import { Button, Header } from '../../components';
 import { ProductsList } from '../ListProducts/subComponents';
 import { GET_PRODUCTS } from './gqls';
 import { normalizeString } from '../../utils/normalizeString';
@@ -25,19 +18,7 @@ export const HomeComponent = ({ navigation }) => {
 
   return (
     <Container>
-      <StatusBar
-        animated
-        barStyle='light-content'
-        backgroundColor={theme.brandPrimary}
-      />
-      <View
-        style={{
-          backgroundColor: theme.brandPrimary,
-          flexDirection: 'row',
-          padding: 8,
-          alignItems: 'center',
-        }}
-      >
+      <Header>
         <Button light transparent onPress={() => navigation.openDrawer()}>
           <Icon name='menu' />
         </Button>
@@ -74,7 +55,7 @@ export const HomeComponent = ({ navigation }) => {
           <Icon name='funnel' />
         </Button>
         <CartResume />
-      </View>
+      </Header>
       {error || loading || products.length === 0 ? (
         <View style={{ flex: 1 }} />
       ) : (

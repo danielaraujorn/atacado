@@ -11,13 +11,10 @@ input ProductQuantityInput {
 	productId: ID!
 	quantity: Int!
 }
+
 input NewProductInput {
 	name: String!
 	price: Int!
-}
-
-type CountType {
-	count: Int
 }
 
 type Query {
@@ -25,11 +22,12 @@ type Query {
 	getOwnUser: User @requireAuth
 	getUsers(email: String!): [User] @requireAuth
 	getCart: [CartItem] @requireAuth
-	getCartCount: CountType @requireAuth
+	getCartCount: Int! @requireAuth
 
 	# Product:
 	getProducts(where: ProductWhereInput): [Product]
 	getProduct(id: ID!): Product!
+	isProductFavorite(id: ID!): Boolean! @requireAuth
 
 	# Category
 	getCategories(where: CategoryWhereInput): [Category]
@@ -51,6 +49,7 @@ type Mutation {
 		price: Int!
 		description: String
 	): Product @requireRole(role: OWNER)
+	toggleFavorite(id: ID!): Boolean! @requireAuth
 
 	# User:
 	createUser(firstName: String!, email: String!, password: String!): User!
