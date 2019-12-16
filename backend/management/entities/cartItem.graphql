@@ -2,8 +2,8 @@ type CartItem {
 	id: ID! @id @unique
 	user: User!
 	product: Product!
+	deleted: Boolean @default(value: false)
 	quantity: Int!
-	deliveryDate: DateTime
 	createdAt: DateTime! @createdAt
 	updatedAt: DateTime! @updatedAt
 }

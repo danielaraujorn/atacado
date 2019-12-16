@@ -5,7 +5,9 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { createHttpLink } from 'apollo-link-http';
 import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory';
 import { onError } from 'apollo-link-error';
-const REACT_APP_HOST = 'http://8822fcb9.ngrok.io/graphql';
+import { EventRegister } from 'react-native-event-listeners';
+
+const REACT_APP_HOST = 'https://3fa6871e.ngrok.io/graphql';
 const REACT_APP_WSHOST = 'ws://192.168.1.5:4000/graphql';
 
 const hasSubscriptionOperation = ({ query: { definitions }, getContext }) => {
@@ -30,7 +32,8 @@ const errorLink = onError(({ networkError, graphQLErrors }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(({ message, extensions, locations, path }) => {
       if (extensions.code === 'UNAUTHENTICATED') {
-        console.log('deslogado');
+        console.log('UNAUTHENTICATED');
+        EventRegister.emit('Navigate', 'Auth');
       }
       console.log(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
@@ -64,5 +67,10 @@ const cache = new InMemoryCache({
 export const client = new ApolloClient({
   link,
   cache,
-  resolvers: {},
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: 'cache-and-network',
+      notifyOnNetworkStatusChange: true,
+    },
+  },
 });

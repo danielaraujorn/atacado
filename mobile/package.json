@@ -1,5 +1,5 @@
 {
-  "name": "mobile",
+  "name": "atacado",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -25,6 +25,7 @@
     "react": "^16.12.0",
     "react-hook-form": "^3.28.13",
     "react-native": "0.61.2",
+    "react-native-event-listeners": "^1.0.3",
     "react-native-gesture-handler": "^1.5.2",
     "react-native-image-slider-box": "^1.0.5",
     "react-native-linear-gradient": "^2.5.6",

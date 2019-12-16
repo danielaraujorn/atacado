@@ -21,6 +21,8 @@ export const AuthLoadingComponent = ({ navigation }) => {
   useQuery(GET_OWN_USER, {
     onCompleted,
     onError,
+    fetchPolicy: 'network-only',
+    errorPolicy: 'all',
   });
   return (
     <View

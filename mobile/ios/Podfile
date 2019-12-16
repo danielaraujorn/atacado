@@ -1,8 +1,8 @@
 platform :ios, '9.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-target 'mobile' do
-  # Pods for mobile
+target 'atacado' do
+  # Pods for atacado
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
   pod 'FBReactNativeSpec', :path => "../node_modules/react-native/Libraries/FBReactNativeSpec"
   pod 'RCTRequired', :path => "../node_modules/react-native/Libraries/RCTRequired"
@@ -35,7 +35,7 @@ target 'mobile' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
 
-  target 'mobileTests' do
+  target 'atacadoTests' do
     inherit! :search_paths
     # Pods for testing
   end
@@ -43,10 +43,10 @@ target 'mobile' do
   use_native_modules!
 end
 
-target 'mobile-tvOS' do
-  # Pods for mobile-tvOS
+target 'atacado-tvOS' do
+  # Pods for atacado-tvOS
 
-  target 'mobile-tvOSTests' do
+  target 'atacado-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
   end

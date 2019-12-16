@@ -19,15 +19,18 @@ input NewProductInput {
 
 type Query {
 	# User:
-	getOwnUser: User @requireAuth
+	getOwnUser: User! @requireAuth
 	getUsers(email: String!): [User] @requireAuth
-	getCart: [CartItem] @requireAuth
-	getCartCount: Int! @requireAuth
 
 	# Product:
 	getProducts(where: ProductWhereInput): [Product]
 	getProduct(id: ID!): Product!
 	isProductFavorite(id: ID!): Boolean! @requireAuth
+
+	# Cart:
+	getCartItem(productId: ID!): CartItem! @requireAuth
+	getCart(where: CartItemWhereInput): [CartItem] @requireAuth
+	getCartCount(where: CartItemWhereInput): Int! @requireAuth
 
 	# Category
 	getCategories(where: CategoryWhereInput): [Category]
@@ -41,6 +44,11 @@ type Mutation {
 	# Product:
 	createStore(name: String!, products: [NewProductInput]): Store
 		@requireRole(role: OWNER)
+
+	# Cart:
+	createCartItem(productId: ID!, quantity: Int!): CartItem! @requireAuth
+	deleteCartItem(id: ID!): CartItem @requireAuth
+	updateCartItem(id: ID!, quantity: Int!): CartItem! @requireAuth
 
 	# Product:
 	createProduct(

@@ -9,6 +9,7 @@ const {
 	Query: CategoryQueries,
 	Mutation: CategoryMutations,
 } = require('./category')
+const { Query: CartQueries, Mutation: CartMutations } = require('./cart')
 
 exports.resolvers = {
 	Query: {
@@ -16,12 +17,14 @@ exports.resolvers = {
 		...ProductQueries,
 		...StoreQueries,
 		...CategoryQueries,
+		...CartQueries,
 	},
 	Mutation: {
 		...UserMutations,
 		...ProductMutations,
 		...StoreMutations,
 		...CategoryMutations,
+		...CartMutations,
 	},
 	//Subscription: {},
 	JSON: GraphQLJSON,

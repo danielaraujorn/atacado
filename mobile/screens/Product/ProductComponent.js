@@ -1,12 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dimensions } from 'react-native';
 import { SliderBox } from 'react-native-image-slider-box';
-import { Container, Text, Content, Icon, H1, View } from 'native-base';
+import {
+  Container,
+  Text,
+  Content,
+  Icon,
+  H1,
+  View,
+  Header,
+  Title,
+  Left,
+  Body,
+  Right,
+} from 'native-base';
 import theme from '../../theme';
-import { Button, Header } from '../../components';
+import { Button } from '../../components';
 import { CartResume } from '../Cart';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { GET_PRODUCT, IS_PRODUCT_FAVORITE, INSERT_FAVORITE } from './gqls';
+import {
+  useCreateCartItem,
+  useDeleteCartItem,
+  useGetCartItem,
+} from '../../graphql/cart';
 
 const images = [
   'http://placeimg.com/640/480/any',
@@ -17,28 +34,52 @@ const images = [
 ];
 
 export const ProductComponent = ({ navigation }) => {
-  const productId = navigation.getParam('id');
+  const [quantity, setQuantity] = useState(1);
+
+  const id = navigation.getParam('id');
+
   const { data = {}, loading, error } = useQuery(GET_PRODUCT, {
-    variables: { id: productId },
+    variables: { id },
   });
-  const { data: favoriteData } = useQuery(IS_PRODUCT_FAVORITE, {
-    variables: { id: productId },
+
+  const { data: favoriteData = {} } = useQuery(IS_PRODUCT_FAVORITE, {
+    variables: { id },
   });
   const { isProductFavorite = false } = favoriteData;
 
   const [toggleFavorite] = useMutation(INSERT_FAVORITE, {
-    variables: { id: productId },
+    variables: { id },
     optimisticResponse: {
       toggleFavorite: !isProductFavorite,
     },
-    update: (cache, { data: { toggleFavorite: toogleFavoriteData } }) => {
+    update: (cache, { data: { toggleFavorite: toogleFavoriteData } }) =>
       cache.writeQuery({
         query: IS_PRODUCT_FAVORITE,
-        variables: { id: productId },
+        variables: { id },
         data: { isProductFavorite: toogleFavoriteData },
-      });
-    },
+      }),
   });
+
+  const { data: cartItemData = {}, loading: loadingCartItem } = useGetCartItem({
+    productId: id,
+  });
+  const { getCartItem: cartItem = {} } = cartItemData;
+
+  const {
+    id: cartItemId,
+    quantity: cartItemQuantity,
+    deleted: deletedCartItem,
+  } = cartItem;
+
+  const [createCartItem] = useCreateCartItem({ productId: id, quantity });
+
+  const [deleteCartItem] = useDeleteCartItem({ id: cartItemId, productId: id });
+
+  useEffect(() => {
+    if (cartItemQuantity) {
+      setQuantity(cartItemQuantity);
+    }
+  }, [cartItemQuantity, setQuantity]);
 
   if (loading || error) return null;
 
@@ -49,18 +90,20 @@ export const ProductComponent = ({ navigation }) => {
   return (
     <Container>
       <Header>
-        <View>
+        <Left>
           <Button light transparent onPress={() => navigation.goBack()}>
             <Icon name='arrow-back' />
           </Button>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={{ color: theme.brandLight, fontSize: 18 }}>Produto</Text>
-        </View>
-        <Button light transparent onPress={toggleFavorite}>
-          <Icon name={isProductFavorite ? 'heart' : 'heart-empty'} />
-        </Button>
-        <CartResume />
+        </Left>
+        <Body>
+          <Title>Produto</Title>
+        </Body>
+        <Right>
+          <Button light transparent onPress={toggleFavorite}>
+            <Icon name={isProductFavorite ? 'heart' : 'heart-empty'} />
+          </Button>
+          <CartResume navigation={navigation} />
+        </Right>
       </Header>
       <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
         <SliderBox
@@ -91,12 +134,26 @@ export const ProductComponent = ({ navigation }) => {
           R${price} por {unit}
         </Text>
         {!!description && <Text style={{ marginTop: 15 }}>{description}</Text>}
-        <Button bordered inside style={{ marginTop: 30 }}>
-          <Text>Quantidade: 1</Text>
-        </Button>
-        <Button inside style={{ marginTop: 15 }}>
-          <Text>Adicionar do carrinho</Text>
-        </Button>
+        {!loadingCartItem &&
+          (!deletedCartItem && cartItemId ? (
+            <>
+              <Button bordered inside style={{ marginTop: 30 }}>
+                <Text>Quantidade no carrinho: {quantity}</Text>
+              </Button>
+              <Button inside style={{ marginTop: 15 }} onPress={deleteCartItem}>
+                <Text>Remover do carrinho</Text>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button bordered inside style={{ marginTop: 30 }}>
+                <Text>Quantidade: {quantity}</Text>
+              </Button>
+              <Button inside style={{ marginTop: 15 }} onPress={createCartItem}>
+                <Text>Adicionar do carrinho</Text>
+              </Button>
+            </>
+          ))}
       </Content>
     </Container>
   );

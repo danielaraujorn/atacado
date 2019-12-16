@@ -4,7 +4,7 @@ const normalizeString = require('../../utils/normalizeString')
 exports.createProduct = async (_, args, ctx) => {
 	const { name, storeId, price, description } = args
 
-	await getUserModelPermission({ ctx, model: 'store', storeId })
+	await getUserModelPermission({ ctx, model: 'store', id: storeId })
 
 	const product = await ctx.prisma.createProduct({
 		name,
