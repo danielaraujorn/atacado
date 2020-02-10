@@ -44,14 +44,14 @@ export const ProductItem = ({ product, navigation }) => {
             }}
           />
         </View>
-        <View style={{ paddingTop: 5, paddingHorizontal: 8 }}>
-          <Text style={{ fontWeight: 'bold' }}>{name}</Text>
-          {!!description && <Text>{description}</Text>}
+        <View style={{ paddingTop: 4, paddingHorizontal: 8 }}>
           {!!price && (
-            <Text style={{ marginTop: 5 }}>
-              R${price} {!!unit && 'por ' + unit}
-            </Text>
+            <View style={{ flexDirection: 'row' }}>
+              <Text style={{ fontWeight: 'bold' }}>R$ {price}</Text>
+              {!!unit && <Text style={{ fontSize: 15 }}> /{unit}</Text>}
+            </View>
           )}
+          <Text style={{ fontSize: 15 }}>{name}</Text>
         </View>
       </View>
     </TouchableOpacity>

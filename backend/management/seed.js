@@ -62,16 +62,16 @@ const main = async () => {
 		},
 	}
 
-	const STORE_DATA = {
+	const STORE_1_DATA = {
 		name: 'Loja 1',
 		normalizedName: normalizeString('Loja 1'),
 		user: { connect: { id: OWNER.id } },
 		products: {
-			create: [PRODUCT_1_DATA, PRODUCT_2_DATA, PRODUCT_3_DATA, PRODUCT_4_DATA],
+			create: [PRODUCT_1_DATA, PRODUCT_2_DATA],
 		},
 	}
-	const STORE = await prisma.createStore(STORE_DATA)
-	console.log(STORE)
+	const STORE_1 = await prisma.createStore(STORE_1_DATA)
+	console.log(STORE_1)
 
 	const CLIENT_DATA = {
 		email: 'client@email.com',
@@ -90,6 +90,17 @@ const main = async () => {
 	}
 	const OWNER_2 = await prisma.createUser(OWNER_2_DATA)
 	console.log(OWNER_2)
+
+	const STORE_2_DATA = {
+		name: 'Loja 2',
+		normalizedName: normalizeString('Loja 2'),
+		user: { connect: { id: OWNER_2.id } },
+		products: {
+			create: [PRODUCT_3_DATA, PRODUCT_4_DATA],
+		},
+	}
+	const STORE_2 = await prisma.createStore(STORE_2_DATA)
+	console.log(STORE_2)
 }
 
 main()

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Dimensions } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Dimensions, KeyboardAvoidingView } from 'react-native';
 import { SliderBox } from 'react-native-image-slider-box';
 import {
   Container,
@@ -13,9 +13,12 @@ import {
   Left,
   Body,
   Right,
+  Input,
+  Item,
+  Label,
+  Button,
 } from 'native-base';
 import theme from '../../theme';
-import { Button } from '../../components';
 import { CartResume } from '../Cart';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { GET_PRODUCT, IS_PRODUCT_FAVORITE, INSERT_FAVORITE } from './gqls';
@@ -35,6 +38,9 @@ const images = [
 
 export const ProductComponent = ({ navigation }) => {
   const [quantity, setQuantity] = useState(1);
+
+  const editQuantity = newValue => () =>
+    setQuantity(newValue > 1 ? newValue : 1);
 
   const id = navigation.getParam('id');
 
@@ -71,7 +77,10 @@ export const ProductComponent = ({ navigation }) => {
     deleted: deletedCartItem,
   } = cartItem;
 
-  const [createCartItem] = useCreateCartItem({ productId: id, quantity });
+  const [createCartItem] = useCreateCartItem({
+    productId: id,
+    quantity: Number(quantity),
+  });
 
   const [deleteCartItem] = useDeleteCartItem({ id: cartItemId, productId: id });
 
@@ -81,11 +90,28 @@ export const ProductComponent = ({ navigation }) => {
     }
   }, [cartItemQuantity, setQuantity]);
 
-  if (loading || error) return null;
-
   const { getProduct: product = {} } = data;
   const { name, price, description, unit } = product;
   const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+  const [actionButtonText, actionButtonProps] = useMemo(() => {
+    if (!deletedCartItem && cartItemId) {
+      if (cartItemQuantity !== quantity)
+        return ['Alterar quantidade', { onPress: createCartItem }];
+      else
+        return [
+          'Remover do carrinho',
+          { onPress: deleteCartItem, bordered: true },
+        ];
+    } else return ['Adicionar do carrinho', { onPress: createCartItem }];
+  }, [
+    cartItemId,
+    cartItemQuantity,
+    createCartItem,
+    deleteCartItem,
+    deletedCartItem,
+    quantity,
+  ]);
 
   return (
     <Container>
@@ -105,56 +131,82 @@ export const ProductComponent = ({ navigation }) => {
           <CartResume navigation={navigation} />
         </Right>
       </Header>
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-        <SliderBox
-          images={images}
-          sliderBoxHeight={SCREEN_HEIGHT / 2}
-          dotColor={'#00000000'}
-          inactiveDotColor={'#00000000'}
-        />
-        <View style={{ position: 'absolute' }}>
-          <Text
-            style={{
-              zIndex: 1,
-              margin: 15,
-              backgroundColor: theme.brandLight + 'dd',
-              paddingVertical: 6,
-              paddingHorizontal: 8,
-              fontSize: 14,
-              borderRadius: 5,
-            }}
-          >
-            {images.length || 0} fotos
-          </Text>
-        </View>
-      </View>
-      <Content style={{ padding: 20 }}>
-        <H1>{name}</H1>
-        <Text style={{ color: theme.brandPrimary, fontWeight: 'bold' }}>
-          R${price} por {unit}
-        </Text>
-        {!!description && <Text style={{ marginTop: 15 }}>{description}</Text>}
-        {!loadingCartItem &&
-          (!deletedCartItem && cartItemId ? (
-            <>
-              <Button bordered inside style={{ marginTop: 30 }}>
-                <Text>Quantidade no carrinho: {quantity}</Text>
-              </Button>
-              <Button inside style={{ marginTop: 15 }} onPress={deleteCartItem}>
-                <Text>Remover do carrinho</Text>
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button bordered inside style={{ marginTop: 30 }}>
-                <Text>Quantidade: {quantity}</Text>
-              </Button>
-              <Button inside style={{ marginTop: 15 }} onPress={createCartItem}>
-                <Text>Adicionar do carrinho</Text>
-              </Button>
-            </>
-          ))}
-      </Content>
+      {loading || error ? null : (
+        <>
+          <Content>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+              <SliderBox
+                images={images}
+                sliderBoxHeight={SCREEN_HEIGHT / 2}
+                dotColor={'#00000000'}
+                inactiveDotColor={'#00000000'}
+              />
+              <View style={{ position: 'absolute' }}>
+                <Text
+                  style={{
+                    zIndex: 1,
+                    margin: 15,
+                    backgroundColor: theme.brandLight + 'dd',
+                    paddingVertical: 6,
+                    paddingHorizontal: 8,
+                    fontSize: 14,
+                    borderRadius: 5,
+                  }}
+                >
+                  {images.length || 0} fotos
+                </Text>
+              </View>
+            </View>
+            <View style={{ padding: 20 }}>
+              <H1>{name}</H1>
+              <Text style={{ color: theme.brandPrimary, fontWeight: 'bold' }}>
+                R${price} por {unit}
+              </Text>
+              {!!description && (
+                <Text style={{ marginTop: 15 }}>{description}</Text>
+              )}
+              {!loadingCartItem && (
+                <>
+                  <KeyboardAvoidingView style={{ marginTop: 30 }}>
+                    <Label>Quantidade:</Label>
+                    <Item style={{ padding: 4 }}>
+                      <Button
+                        rounded
+                        bordered
+                        onPress={editQuantity(quantity - 1)}
+                      >
+                        <Icon name='remove' />
+                      </Button>
+                      <Input
+                        onChangeText={text => editQuantity(Number(text))()}
+                        style={{ textAlign: 'center' }}
+                        keyboardType='number-pad'
+                        value={String(quantity)}
+                      />
+                      <Button
+                        rounded
+                        bordered
+                        onPress={editQuantity(quantity + 1)}
+                      >
+                        <Icon name='add' />
+                      </Button>
+                    </Item>
+                  </KeyboardAvoidingView>
+
+                  <Button
+                    style={{ marginTop: 15 }}
+                    rounded
+                    block
+                    {...actionButtonProps}
+                  >
+                    <Text>{actionButtonText}</Text>
+                  </Button>
+                </>
+              )}
+            </View>
+          </Content>
+        </>
+      )}
     </Container>
   );
 };

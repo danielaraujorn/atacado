@@ -1,11 +1,12 @@
 import React from 'react';
 import { Icon } from 'native-base';
 import { Button } from '../../components';
-import { useGetCartCount } from '../../graphql/cart';
+import { useGetCartItemCount, useGetCart } from '../../graphql/cart';
 
 export const CartResume = ({ navigation }) => {
-  const { data = {} } = useGetCartCount();
-  const { getCartCount: count = 0 } = data;
+  const { data = {} } = useGetCartItemCount();
+  useGetCart();
+  const { getCartItemCount: count = 0 } = data;
   return (
     <Button
       transparent

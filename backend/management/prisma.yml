@@ -4,7 +4,7 @@ datamodel:
   - entities/product.graphql
   - entities/store.graphql
   - entities/purchase.graphql
-  - entities/cartItem.graphql
+  - entities/cart.graphql
   - entities/category.graphql
   - entities/language.graphql
 generate:

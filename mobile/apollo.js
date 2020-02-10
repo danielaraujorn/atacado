@@ -7,7 +7,7 @@ import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory';
 import { onError } from 'apollo-link-error';
 import { EventRegister } from 'react-native-event-listeners';
 
-const REACT_APP_HOST = 'https://3fa6871e.ngrok.io/graphql';
+const REACT_APP_HOST = 'https://d731e548.ngrok.io/graphql';
 const REACT_APP_WSHOST = 'ws://192.168.1.5:4000/graphql';
 
 const hasSubscriptionOperation = ({ query: { definitions }, getContext }) => {

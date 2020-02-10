@@ -1,16 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, TouchableOpacity } from 'react-native';
 import { Text, View, Icon } from 'native-base';
 import { Button } from '../../../components';
 import theme from '../../../theme';
-import { useDeleteCartItem } from '../../../graphql/cart';
+import { useDeleteCartItem, useCreateCartItem } from '../../../graphql/cart';
 
-export const CartItem = ({ id, product = {}, quantity = 0 }) => {
+export const CartItem = ({ id, product = {}, quantity = 0, navigation }) => {
+  const [localQuantity, setLocalQuantity] = useState(quantity);
+
   const { id: productId, name = '', price = 0 } = product;
   const [deleteCartItem] = useDeleteCartItem({ id, productId });
+  const [increaseCartItem] = useCreateCartItem({
+    productId,
+    quantity: localQuantity + 1,
+  });
+  const [decreaseCartItem] = useCreateCartItem({
+    productId,
+    quantity: localQuantity - 1,
+  });
 
+  const [deleting, setDeleting] = useState(false);
   return (
-    <View
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() => navigation.push('Product', { id: productId })}
       style={{
         flexDirection: 'row',
         alignItems: 'flex-start',
@@ -19,7 +32,10 @@ export const CartItem = ({ id, product = {}, quantity = 0 }) => {
       }}
     >
       <TouchableOpacity
-        onPress={deleteCartItem}
+        onPress={() => {
+          deleteCartItem();
+          setDeleting(true);
+        }}
         style={{
           backgroundColor: theme.brandDark,
           position: 'absolute',
@@ -40,6 +56,7 @@ export const CartItem = ({ id, product = {}, quantity = 0 }) => {
           height: 120,
           width: 120,
           borderRadius: theme.borderRadius,
+          opacity: deleting ? 0.5 : 1,
         }}
         source={{
           uri:
@@ -52,10 +69,23 @@ export const CartItem = ({ id, product = {}, quantity = 0 }) => {
           minHeight: 120,
           paddingLeft: 10,
           justifyContent: 'center',
+          opacity: deleting ? 0.5 : 1,
         }}
       >
-        <Text style={{ fontWeight: 'bold', fontSize: 22 }}>{name}</Text>
-        <View style={{ flexDirection: 'row', marginTop: 6 }}>
+        <Text
+          style={{
+            fontWeight: 'bold',
+            fontSize: 22,
+          }}
+        >
+          {name}
+        </Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginTop: 6,
+          }}
+        >
           <Text
             style={{
               fontWeight: 'bold',
@@ -68,7 +98,14 @@ export const CartItem = ({ id, product = {}, quantity = 0 }) => {
             R${price}
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Button transparent>
+            <Button
+              rounded
+              bordered
+              onPress={() => {
+                setLocalQuantity(localQuantity - 1);
+                decreaseCartItem();
+              }}
+            >
               <Icon name='arrow-dropleft' />
             </Button>
             <Text
@@ -78,14 +115,21 @@ export const CartItem = ({ id, product = {}, quantity = 0 }) => {
                 fontSize: 18,
               }}
             >
-              {quantity}
+              {localQuantity}
             </Text>
-            <Button transparent>
+            <Button
+              rounded
+              bordered
+              onPress={() => {
+                setLocalQuantity(localQuantity + 1);
+                increaseCartItem();
+              }}
+            >
               <Icon name='arrow-dropright' />
             </Button>
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };

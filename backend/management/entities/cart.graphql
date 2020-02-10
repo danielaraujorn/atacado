@@ -1,0 +1,28 @@
+type CartItem {
+	id: ID! @id @unique
+	user: User!
+	product: Product!
+	quantity: Int!
+	cartGroup: CartGroup @relation(name: "CartGroupItems")
+	deleted: Boolean @default(value: false)
+	createdAt: DateTime! @createdAt
+	updatedAt: DateTime! @updatedAt
+}
+
+enum FreightStatus {
+	NULL
+	VALUED
+	APPROVED
+}
+
+type CartGroup {
+	id: ID! @id @unique
+	user: User!
+	items: [CartItem] @relation(onDelete: CASCADE, name: "CartGroupItems")
+	store: Store!
+	freight: Int @default(value: 0)
+	freightStatus: FreightStatus @default(value: NULL)
+	deleted: Boolean @default(value: false)
+	createdAt: DateTime! @createdAt
+	updatedAt: DateTime! @updatedAt
+}

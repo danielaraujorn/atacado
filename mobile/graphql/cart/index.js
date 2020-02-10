@@ -3,21 +3,31 @@ import { useQuery, useMutation } from '@apollo/react-hooks';
 
 export const GET_CART = gql`
   query getCart {
-    getCart(where: { deleted: false }) {
+    getCart(where: { items_some: { deleted: false } }) {
       id
-      quantity
-      product {
+      freight
+      freightStatus
+      store {
         id
         name
-        price
+      }
+      items {
+        id
+        deleted
+        quantity
+        product {
+          id
+          name
+          price
+        }
       }
     }
   }
 `;
 
 export const GET_CART_COUNT = gql`
-  query getCartCount {
-    getCartCount(where: { deleted: false })
+  query getCartItemCount {
+    getCartItemCount(where: { deleted: false })
   }
 `;
 
@@ -37,6 +47,12 @@ export const CREATE_CART_ITEM = gql`
       id
       quantity
       deleted
+      product {
+        store {
+          id
+        }
+        id
+      }
     }
   }
 `;
@@ -59,24 +75,45 @@ export const useGetCartItem = ({ productId }) =>
     fetchPolicy: 'network-only',
   });
 
-export const useGetCartCount = () => useQuery(GET_CART_COUNT);
+export const useGetCartItemCount = () => useQuery(GET_CART_COUNT);
 
 export const useCreateCartItem = ({ productId, quantity }) =>
   useMutation(CREATE_CART_ITEM, {
     variables: { productId, quantity },
     update: (cache, { data: { createCartItem: createCartItemData } }) => {
+      const { getCart = [] } = cache.readQuery({ query: GET_CART }) || {};
+      const alreadyExist = getCart.some(({ items }) =>
+        items.some(cartItem => cartItem.id === createCartItemData.id),
+      );
+      if (alreadyExist) {
+        cache.writeQuery({
+          query: GET_CART,
+          data: {
+            getCart: getCart.map(({ items, ...group }) => ({
+              ...group,
+              items: items.map(item =>
+                item.id === createCartItemData.id
+                  ? { ...item, quantity }
+                  : item,
+              ),
+            })),
+          },
+        });
+      }
       cache.writeQuery({
         query: GET_CART_ITEM,
         variables: { productId },
         data: { getCartItem: createCartItemData },
       });
-      const { getCartCount } = cache.readQuery({
-        query: GET_CART_COUNT,
-      });
-      cache.writeQuery({
-        query: GET_CART_COUNT,
-        data: { getCartCount: getCartCount + 1 },
-      });
+      if (!alreadyExist) {
+        const { getCartItemCount } = cache.readQuery({
+          query: GET_CART_COUNT,
+        });
+        cache.writeQuery({
+          query: GET_CART_COUNT,
+          data: { getCartItemCount: getCartItemCount + 1 },
+        });
+      }
     },
   });
 
@@ -90,20 +127,28 @@ export const useDeleteCartItem = ({ id, productId }) =>
         data: { getCartItem: deleteCartItemData },
       });
 
-      const { getCart } = cache.readQuery({ query: GET_CART });
+      const { getCart = [] } = cache.readQuery({ query: GET_CART }) || {};
+
       cache.writeQuery({
         query: GET_CART,
         data: {
-          getCart: getCart.filter(item => item.id !== deleteCartItemData.id),
+          getCart: getCart.map(({ items, ...group }) => ({
+            ...group,
+            items: items.map(item =>
+              item.id === deleteCartItemData.id
+                ? { ...item, deleted: true }
+                : item,
+            ),
+          })),
         },
       });
 
-      const { getCartCount } = cache.readQuery({
+      const { getCartItemCount } = cache.readQuery({
         query: GET_CART_COUNT,
       });
       cache.writeQuery({
         query: GET_CART_COUNT,
-        data: { getCartCount: getCartCount - 1 },
+        data: { getCartItemCount: getCartItemCount - 1 },
       });
     },
   });

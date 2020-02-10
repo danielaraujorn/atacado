@@ -1,6 +1,8 @@
 type Purchase {
 	id: ID! @id @unique
-	cart: [CartItem]!
+	cart: [CartGroup]!
+	price: Int! @default(value: 0)
+	freight: Int! @default(value: 0)
 	createdAt: DateTime! @createdAt
 	updatedAt: DateTime! @updatedAt
 }

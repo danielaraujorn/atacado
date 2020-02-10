@@ -29,8 +29,8 @@ type Query {
 
 	# Cart:
 	getCartItem(productId: ID!): CartItem! @requireAuth
-	getCart(where: CartItemWhereInput): [CartItem] @requireAuth
-	getCartCount(where: CartItemWhereInput): Int! @requireAuth
+	getCart(where: CartGroupWhereInput): [CartGroup] @requireAuth
+	getCartItemCount(where: CartItemWhereInput): Int! @requireAuth
 
 	# Category
 	getCategories(where: CategoryWhereInput): [Category]
